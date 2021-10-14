@@ -1,14 +1,19 @@
 import numpy as np
 import math
-# TODO: TYPE CHECKING IN OPERATOR OVERLOAD
-# TODO: Add docstrings
-# TODO: Printing computational graph: https://stackoverflow.com/questions/22920433/python-draw-flowchart-illustration-graphs
-class Variable():
 
-    independentvariables = []
+'''
+TODO: 
+- TYPE CHECKING IN OPERATOR OVERLOAD
+- Add docstrings
+- Printing computational graph: https://stackoverflow.com/questions/22920433/python-draw-flowchart-illustration-graphs
+'''
+
+class Variable(): # Creating a computational graph capable of evaluating a function and taking its gradient 
+
+    independentvariables = [] # Store current independent variables in the computational graph 
 
     @ staticmethod
-    def onehotvector(name):
+    def onehotvector(name): # Create a vector of zeros except for one location (to use for the gradient of an independent variable)
         index = Variable.indexinvector(name)
 
         gradient_vector = np.zeros(shape = len(Variable.independentvariables))
@@ -18,7 +23,7 @@ class Variable():
         return gradient_vector
 
     @ staticmethod
-    def indexinvector(name):
+    def indexinvector(name): # Find the index of an independent variable in the gradient vector
         Variable.independentvariables.sort()
         assert len(set(Variable.independentvariables)) == len(Variable.independentvariables)
 
@@ -28,7 +33,7 @@ class Variable():
 
         return -1
 
-    def __init__(self, name = None, evaluate = None, grad = None):
+    def __init__(self, name = None, evaluate = None, grad = None): # Create a node
         
         # Store Independent Variable Name 
         if name != None: # Name exists if and only if instance is an independent variable
@@ -45,15 +50,15 @@ class Variable():
             self.grad = grad
         
     
-    def __call__(self, **kargs):
+    def __call__(self, **kargs): # So that z(x1 = 2, x2 = 5), for instance, will work 
         #print(type(kargs))
         #print(kargs) 
         return self.evaluate(kargs)
     
-    def gradient(self, **kargs):
+    def gradient(self, **kargs): # So that z.gradient(x1 = 2, x2 = 5) will work
         return self.grad(values = kargs)
 
-    def __add__(self, other):
+    def __add__(self, other): # Addition node
         if isinstance(other, Variable): # Adding with Variable Instance
             return Variable(
                 name = None, 
@@ -68,10 +73,10 @@ class Variable():
             )
 
     
-    def __radd__(self, other):
+    def __radd__(self, other): # Reverse addition 
         return self.__add__(other)            
 
-    def __mul__(self, other):
+    def __mul__(self, other): # Multiplication node
         if isinstance(other, Variable): # Multiplying with Variable Instance
             return Variable(
                 name = None, 
@@ -85,10 +90,10 @@ class Variable():
                 grad = lambda values : other * self.grad(values),
             )
 
-    def __rmul__(self, other):
+    def __rmul__(self, other): # Reverse multiplication 
         return self.__mul__(other)
 
-    def __pow__(self, other):
+    def __pow__(self, other): # Exponent node 
         if isinstance(other, Variable): # Power is Variable Instance
             return Variable(
                 name = None, 
@@ -102,7 +107,7 @@ class Variable():
                 grad = lambda values : pow(self.evaluate(values), other) * (Variable.ln(self).mul(other)).grad 
             )
 
-    def __rpow__(self, other):
+    def __rpow__(self, other): # Reverse exponent
         if isinstance(other, Variable): # Power is variable, base is constant
             return Variable(
                 name = None,
@@ -116,7 +121,7 @@ class Variable():
                 grad = lambda values : pow(other.evaluate(values), self.evaluate(values)) * (self.__mul__(Variable.ln(other))).grad 
            )
     
-    def __sub__(self, other):
+    def __sub__(self, other): # Subtraction node 
         if isinstance(other, Variable): # Subtracting with Variable Instance
             return Variable(
                 name = None, 
@@ -130,7 +135,7 @@ class Variable():
                 grad = lambda values : self.grad(values)
             )
 
-    def __rsub__ (self, other):
+    def __rsub__ (self, other): # Reverse subtraction
         if isinstance(other, Variable): # Subtracting with Variable Instance
             return Variable(
                 name = None, 
@@ -144,14 +149,14 @@ class Variable():
                 grad = lambda values: -1 * self.grad(values)
             )
 
-    def __truediv__(self, other):
+    def __truediv__(self, other): # Division node (truediv means division without flooring)
         return self.__mul__(other ** -1)
     
-    def __rtruediv__(self, other):
+    def __rtruediv__(self, other): # Reverse division
         return (self.__truediv__(other)) ** -1
 
     @ staticmethod 
-    def exp(other):
+    def exp(other): # e^(x) node
         if isinstance(other, Variable): # e^a variable
             return Variable(
                 name = None,
@@ -166,7 +171,7 @@ class Variable():
             )
             
     @ staticmethod
-    def ln(other):
+    def ln(other): # ln(x) node
         if isinstance(other, Variable): #ln(a variable)
             return Variable(
                 name = None,
