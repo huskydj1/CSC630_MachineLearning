@@ -18,6 +18,22 @@ class LogisticRegression():
         # Gradient Descent
         for iter in range(0, 100):
             pass
+
+    def generate_costvariable(self, x):
+        
+        # Get Variable cost
+        cost = 0
+        for i in range(self.num_samples):
+            y_hat = self.generate_yhat(X[i].flatten())
+            cost += 
+        cost *= -1
+
+        # Dictinoify Parameters
+        parameters = {f"m{i}" : self.m_values[i] for i in range(self.num_features)}
+        parameters["b"] = self.b_value
+
+        # Evaluate
+        return y_hat(**parameters)
     
     def initializeParameters(self): # TODO: COMPLETELY RANDOMIFY EVERYTHING BY ADDING SEED TO RANDOM
         m_values = [math.random() - 0.5 for i in range(self.num_features)]
@@ -30,9 +46,14 @@ class LogisticRegression():
         y_hat = sum([Variable(name = f"m{i}") * x[i] for i in range(self.num_features)]) + Variable(name = "b")
         return y_hat
 
-    def evaluate(self, x):
-        # Get Variable y_hat
-        y_hat = self.generate_yhat(x)
+    def evaluate_cost(self, X):
+
+        # Get Variable cost
+        cost = 0
+        for i in range(self.num_samples):
+            y_hat = self.generate_yhat(X[i].flatten())
+            cost += 
+        cost *= -1
 
         # Dictinoify Parameters
         parameters = {f"m{i}" : self.m_values[i] for i in range(self.num_features)}
@@ -41,6 +62,8 @@ class LogisticRegression():
         # Evaluate
         return y_hat(**parameters)
 
+    def evaluate_cost(self, x):
+        
 
     def gradient(self, x):
         # Get Variable y_hat
