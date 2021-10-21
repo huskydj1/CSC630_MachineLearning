@@ -81,7 +81,7 @@ class Variable():
         else: # Multiplying with constant
             return Variable(
                 name = None, 
-                evaluate = lambda values : self.evaluate(values * other),
+                evaluate = lambda values : other * self.evaluate(values),
                 grad = lambda values : other * self.grad(values),
             )
 
@@ -89,66 +89,36 @@ class Variable():
         return self.__mul__(other)
 
     def __pow__(self, other):
-        if isinstance(other, Variable): # Power is Variable Instance
-            return Variable(
-                name = None, 
-                evaluate = lambda values : pow(self.evaluate(values), other.evaluate(values)),
-                grad = lambda values : pow(self.evaluate(values), other.evaluate(values)) * (other.__mul__(Variable.ln(self))).grad 
-           )
-        else: # Power is a constant
+        if isinstance(other, (float, int)): # Power is a constant
             return Variable(
                 name = None, 
                 evaluate = lambda values : pow(self.evaluate(values), other),
-                grad = lambda values : pow(self.evaluate(values), other) * (Variable.ln(self).mul(other)).grad 
+                grad = lambda values : other * pow(self.evaluate(values), other - 1) * self.grad(values) 
             )
+        else:
+            return NotImplemented
 
     def __rpow__(self, other):
-        if isinstance(other, Variable): # Power is variable, base is constant
-            return Variable(
-                name = None,
-                evaluate = lambda values : pow(other, self.evaluate(values)),
-                grad = lambda values : pow(other, self.evaluate(values)) * (self.__mul__(math.ln(other))).grad
-            )
-        else: # Power is variable, base is variable
+        if isinstance(other, (float, int)):
             return Variable(
                 name = None, 
-                evaluate = lambda values : pow(other.evaluate(values), self.evaluate(values)),
-                grad = lambda values : pow(other.evaluate(values), self.evaluate(values)) * (self.__mul__(Variable.ln(other))).grad 
+                evaluate = lambda values : pow(other, self.evaluate(values)),
+                grad = lambda values : Variable.log(other) * pow(other, self.evaluate(values)) * self.grad(values)
            )
+        else:
+            return NotImplemented
     
     def __sub__(self, other):
-        if isinstance(other, Variable): # Subtracting with Variable Instance
-            return Variable(
-                name = None, 
-                evaluate = lambda values : self.evaluate(values) - other.evaluate(values),
-                grad = lambda values : self.grad(values) - other.grad(values)
-            )
-        else: # Subtracting with Constant
-            return Variable(
-                name = None,
-                evaluate = lambda values : self.evaluate(values) - other,
-                grad = lambda values : self.grad(values)
-            )
+        return self + -1*other
 
     def __rsub__ (self, other):
-        if isinstance(other, Variable): # Subtracting with Variable Instance
-            return Variable(
-                name = None, 
-                evaluate = lambda values : other.evaluate(values) - self.evaluate(values),
-                grad = lambda values : other.grad(values) - self.grad(values)
-            )
-        else: # Subtracting with Constant
-            return Variable(
-                name = None,
-                evaluate = lambda values : other - self.evaluate(values),
-                grad = lambda values: -1 * self.grad(values)
-            )
+        return other + -1*self
 
     def __truediv__(self, other):
-        return self.__mul__(other ** -1)
+        return self * (other ** -1)
     
     def __rtruediv__(self, other):
-        return (self.__truediv__(other)) ** -1
+        return (self * (other ** -1)) ** -1
 
     @ staticmethod 
     def exp(other):
@@ -156,7 +126,7 @@ class Variable():
             return Variable(
                 name = None,
                 evaluate = lambda values : pow(math.e, other.evaluate(values)),
-                grad = lambda values : pow(math.e, other.evaluate(values)) * other.grad
+                grad = lambda values : pow(math.e, other.evaluate(values)) * other.grad(values)
             )
         else: # e ^ c constant
             return Variable(
@@ -166,10 +136,10 @@ class Variable():
             )
             
     @ staticmethod
-    def ln(other):
-        if isinstance(other, Variable): #ln(a variable)
+    def log(other):
+        if isinstance(other, Variable): #log(a variable)
             return Variable(
                 name = None,
-                evaluate = lambda values : math.ln(other.evaluate(values)),
+                evaluate = lambda values : math.log(other.evaluate(values)),
                 grad = lambda values : pow(other.evaluate(values), -1) * other.grad(values)
             )
