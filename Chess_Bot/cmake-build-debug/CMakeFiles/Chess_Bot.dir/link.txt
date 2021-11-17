@@ -1,3 +1,0 @@
-C:\Users\husky\AppData\Local\JetBrains\Toolbox\apps\CLion\ch-0\202.6948.80\bin\cmake\win\bin\cmake.exe -E rm -f CMakeFiles\Chess_Bot.dir/objects.a
-C:\PROGRA~2\MINGW-~1\I686-8~1.0-P\mingw32\bin\ar.exe cr CMakeFiles\Chess_Bot.dir/objects.a @CMakeFiles\Chess_Bot.dir\objects1.rsp
-C:\MinGW\bin\g++.exe -g   -Wl,--whole-archive CMakeFiles\Chess_Bot.dir/objects.a -Wl,--no-whole-archive  -o Chess_Bot.exe -Wl,--out-implib,libChess_Bot.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Chess_Bot.dir\linklibs.rsp
