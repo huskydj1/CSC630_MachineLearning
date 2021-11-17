@@ -13,6 +13,10 @@ class Variable(): # Creating a computational graph capable of evaluating a funct
     independentvariables = [] # Store current independent variables in the computational graph 
 
     @ staticmethod
+    def resetIndependentVariables():
+        Variable.independentvariables = []
+
+    @ staticmethod
     def onehotvector(name): # Create a vector of zeros except for one location (to use for the gradient of an independent variable)
         index = Variable.indexinvector(name)
 
@@ -25,6 +29,7 @@ class Variable(): # Creating a computational graph capable of evaluating a funct
     @ staticmethod
     def indexinvector(name): # Find the index of an independent variable in the gradient vector
         Variable.independentvariables.sort()
+        # print(Variable.independentvariables, set(Variable.independentvariables))
         assert len(set(Variable.independentvariables)) == len(Variable.independentvariables)
 
         for i, val in enumerate(Variable.independentvariables):
@@ -145,6 +150,6 @@ class Variable(): # Creating a computational graph capable of evaluating a funct
         if isinstance(other, Variable): #log(a variable)
             return Variable(
                 name = None,
-                evaluate = lambda values : math.log(other.evaluate(values)),
-                grad = lambda values : pow(other.evaluate(values), -1) * other.grad(values)
+                evaluate = lambda values : math.log(other.evaluate(values) + 0.01),
+                grad = lambda values : pow(other.evaluate(values) + 0.01, -1) * other.grad(values)
             )
